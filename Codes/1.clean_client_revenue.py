@@ -42,6 +42,9 @@ df_client.y2022 = df_client.y2022.round(1)
 # Create a new column to identify the dataset for merging purposes later
 df_client.insert(2, "data", ['Client_rev', 'Client_rev'], True)
 
+df_client.index.name = 'Segment'
+df_client.reset_index(inplace=True)
+
 # View cleaned dataset
 print(df_client)
 
