@@ -5,6 +5,7 @@
 # Import packages
 import pandas as pd
 import numpy as np
+#from matplotlib import pyplot as plt
 
 #### Import data ####
 
@@ -44,9 +45,43 @@ df_ms['Client_share'] = df_ms['Client_share'].map('{:.0%}'.format)
 df_ms['Target_share'] = df_ms['Target_share'].map('{:.0%}'.format)
 df_ms['Combined_share'] = df_ms['Combined_share'].map('{:.0%}'.format)
 
+# View data
 print(df_ms)
 
 ### Save cleaned data ###
 df_ms.to_csv('../data/output/clean_market_shares_table.csv', index= True)
 
-################################### END OF SCRIPT ###################################
+#### Create chart ####
+
+# Drop unnecessary columns
+df_ms = df_ms[['Client_share', 'Target_share', 'Combined_share']]
+
+# Convert shares from object to float
+df_ms['Client_share'] = df_ms['Client_share'].map('{:.2}'.format)
+df_ms['Target_share'] = df_ms['Target_share'].map('{:.2}'.format)
+df_ms['Combined_share'] = df_ms['Combined_share'].map('{:.2}'.format)
+
+print(df_ms)
+
+df_ms['Client_share'] = df_ms['Client_share'].astype(float)
+df_ms['Target_share'] = df_ms['Target_share'].astype(float)
+df_ms['Combined_share'] = df_ms['Target_share'].astype(float)
+
+print(df_ms.dtypes)
+
+values = ['Client_share','Target_share', 'Combined_share']
+df_ms = pd.pivot_table(df_ms, values=values, index=['Segment','Year'], 
+   fill_value=0).reset_index(level=-1)
+
+df_ms['Combined_share'] = 100 - df_ms['Client_share'] - df_ms['Target_share']
+
+df_ms.rename(columns={'Combined_share': 'Other_share'},inplace=True)
+
+df_ms.index.name = 'Segment'
+df_ms.reset_index(inplace=True)
+
+df_ms = df_ms.melt(id_vars=["Segment", "Year"], var_name="Entity")
+
+df_ms.Entity = df_ms.Entity.str.replace("_share", "")
+
+print(df_ms)
