@@ -36,10 +36,6 @@ df_target['Year'] = 'y20'+df_target['Year']
 # Check class types of the data 
 print(df_target.dtypes)
 
-# Round all Revenue values to millions and 1.d.p
-df_target['Revenue'] = df_target['Revenue']/1000000
-df_target.Revenue = df_target.Revenue.round(1)
-
 ### Transform data ###
 
 # Collapse data and group by Segment and Year
@@ -47,6 +43,10 @@ df_target = df_target.groupby(['Segment','Year']).agg(Revenue=('Revenue', 'sum')
 
 # Pivot table from long to wide
 df_target = df_target.unstack()
+
+# Round all Revenue values to millions and 1.d.p
+df_target['Revenue'] = df_target['Revenue']/1000000
+df_target.Revenue = df_target.Revenue.round(1)
 
 # Remove Revenue header
 df_target = df_target['Revenue']
@@ -56,6 +56,9 @@ df_target.insert(2, "data", ['Target_rev', 'Target_rev'], True)
 
 # Reorder columns 
 df_target = df_target[['y2023', 'y2022', 'data']]
+
+df_target.index.name = 'Segment'
+df_target.reset_index(inplace=True)
 
 #View cleaned dataset
 print(df_target)
