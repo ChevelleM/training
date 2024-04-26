@@ -19,28 +19,34 @@ df_ms = pd.DataFrame()
 for file in files:
     df_ms = pd.concat([df_ms, file])
 
+# Pivot table from long to wide
 df_ms = df_ms.melt(id_vars=["Segment", "data"], var_name="Year")
 
+# Pivot table from wide to long
 df_ms = df_ms.pivot(index=["Segment","Year"], columns="data", values=["value"])
 
 df_ms = df_ms['value']
 
 df_ms = df_ms[['Market_rev', 'Client_rev', 'Target_rev']]
 
+# Create Client share, Target share and Combined share variables
 df_ms.insert(3, "Client_share", df_ms.Client_rev/df_ms.Market_rev, True)
 df_ms.insert(4, "Target_share", df_ms.Target_rev/df_ms.Market_rev, True)
 df_ms.insert(5, "Combined_share", (df_ms.Client_rev + df_ms.Target_rev)/df_ms.Market_rev, True)
 
+# Check class of data
 print(df_ms.dtypes)
 
 df_ms['Market_rev'] = df_ms['Market_rev'].astype('string')
 df_ms['Client_rev'] = df_ms['Client_rev'].astype('string')
 df_ms['Target_rev'] = df_ms['Target_rev'].astype('string')
 
+# Add pound sign and mn to values
 df_ms['Market_rev'] = '£'+ df_ms['Market_rev'] +'mn'
 df_ms['Client_rev'] = '£'+ df_ms['Client_rev'] +'mn'
 df_ms['Target_rev'] = '£'+ df_ms['Target_rev'] +'mn'
 
+# Change format of values to percentage
 df_ms['Client_share'] = df_ms['Client_share'].map('{:.0%}'.format)
 df_ms['Target_share'] = df_ms['Target_share'].map('{:.0%}'.format)
 df_ms['Combined_share'] = df_ms['Combined_share'].map('{:.0%}'.format)
